@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<title>SG PSI</title>
+</head>
+<body>
+    <h3 id = "tableCaption" class = "text-center"></h3>
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th scope="col">Metric</th>
+            <th scope="col">National</th>
+            <th scope="col">Central</th>
+            <th scope="col">West</th>
+            <th scope="col">East</th>
+            <th scope="col">North</th>
+            <th scope="col">South</th>
+
+          </tr>
+        </thead>
+        <tbody id= 'bodyTable'></tbody>
+        </tbody>
+      </table>
+      
+    <script>
+        var dataTable = document.getElementById('bodyTable')
+        var captionTable = document.getElementById('tableCaption')
+        var myDateTime = ""
+        var myReq = new XMLHttpRequest();
+        function loadTable() {
+            myReq.open('GET', 'https://api.data.gov.sg/v1/environment/psi')
+            myReq.onload = function(){
+            try {
+                var data = JSON.parse(myReq.responseText);
+                myDateTime = data.items[0].update_timestamp
+                var dat = data.items[0].readings;
+                console.log(dat)
+                makeTable(dat)
+            } catch (e) {
+                console.warn('Could not fetch data from database!');
+            }
+        };
+        myReq.send();
+        }
+
+        function makeTable(dt){
+            console.log(dt)
+            var row = ''
+            for(var i in dt){
+                console.log(i)
+                row += `<tr>
+                            <td>${i}</td>
+                            <td>${dt[i].national}</td>
+                            <td>${dt[i].central}</td>
+                            <td>${dt[i].west}</td>
+                            <td>${dt[i].east}</td>
+                            <td>${dt[i].north}</td>
+                            <td>${dt[i].south}</td>
+                        </tr>`
+            }
+            dataTable.innerHTML = row;
+
+            let date = new Date( Date.parse(myDateTime) );
+            captionTable.innerHTML = "Last updated " +  date.toLocaleString()
+            console.log('Jobs Done.')
+        }
+        document.addEventListener('DOMContentLoaded', () => {loadTable()})
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>
